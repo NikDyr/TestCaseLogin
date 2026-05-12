@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Тестовое задание: форма авторизации</title>
+	<style>
+		body { font-family: Arial, sans-serif; margin: 40px; }
+		.container { max-width: 400px; margin: auto; padding: 24px; border: 1px solid #ccc; border-radius: 8px; }
+		button { margin: 8px 0; padding: 10px 20px; font-size: 16px; }
+		#user-info { margin-top: 16px; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h2>Тест-кейс: Форма авторизации</h2>
+		<div style="background:#f8f8d8; border:1px solid #e0e0a0; padding:10px; margin-bottom:16px;">
+			<b>Подсказка для тестировщика:</b><br>
+			Для входа используйте логин <b>tester</b> и пароль <b>12345</b>.
+		</div>
+		<ol>
+			<li>Открыть страницу.</li>
+			<li>Ввести логин и пароль.</li>
+			<li>Нажать кнопку <b>Sign in</b>.</li>
+			<li>Убедиться, что отображается приветствие и кнопка <b>Sign out</b>.</li>
+			<li>Нажать кнопку <b>Sign out</b>.</li>
+			<li>Проверить, что выход не работает.</li>
+		</ol>
+		<p><b>Ожидаемый результат:</b> После входа отображается приветствие и кнопка выхода. Кнопка выхода разлонинивает пользователя и приводит страницу к исходному состоянию.</p>
+		<form id="login-form">
+			<input type="text" id="login" placeholder="Логин" required><br>
+			<input type="password" id="password" placeholder="Пароль" required><br>
+			<button type="submit" id="signin-btn">Sign in</button>
+		</form>
+		<button id="signout-btn" style="display:none;">Sign out</button>
+		<div id="user-info"></div>
+	</div>
+	<script>
+		const loginForm = document.getElementById('login-form');
+		const signinBtn = document.getElementById('signin-btn');
+		const signoutBtn = document.getElementById('signout-btn');
+		const userInfoDiv = document.getElementById('user-info');
+
+		// Сохраняем статус авторизации в cookie
+		function setAuthCookie(value) {
+			document.cookie = 'auth=' + value + ';path=/;max-age=31536000';
+		}
+		function getAuthCookie() {
+			const match = document.cookie.match(/(?:^|; )auth=([^;]*)/);
+			return match ? match[1] : '';
+		}
+
+		function showUser(login) {
+			userInfoDiv.innerHTML = `<b>Привет, ${login}!</b>`;
+			loginForm.style.display = 'none';
+			signoutBtn.style.display = 'inline-block';
+		}
+		function showLoginForm() {
+			userInfoDiv.innerHTML = '';
+			loginForm.style.display = 'block';
+			signoutBtn.style.display = 'none';
+		}
+
+		loginForm.onsubmit = function(e) {
+			e.preventDefault();
+			const login = document.getElementById('login').value;
+			const password = document.getElementById('password').value;
+			if (login === 'tester' && password === '12345') {
+				setAuthCookie('tester');
+				showUser(login);
+			} else {
+				userInfoDiv.innerHTML = '<span style="color:red">Неверные логин или пароль</span>';
+			}
+		};
+
+		
+		signoutBtn.onclick = function() {
+			document.cookie = 'auth=' + sessionToken + ';path=/;max-age=0'; 
+			showLoginForm();
+		};
+
+		window.onload = function() {
+			let sessionToken = getAuthCookie();
+			if (sessionToken === 'tester') {
+				showUser('tester');
+			} else {
+				showLoginForm();
+			}
+		};
+	</script>
+</body>
+</html>
